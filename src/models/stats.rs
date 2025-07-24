@@ -62,9 +62,15 @@ impl ObserverStats {
                 .ok_or_else(|| ClientError::MissingField("species_count".to_string()))?;
 
             let user = &item["user"];
-            let name = user["name"].as_str()
-                .ok_or_else(|| ClientError::MissingField("user.name".to_string()))?
-                .to_string();
+            let name = match user["name"].as_str() {
+                Some(n) if !n.is_empty() => n.to_string(),
+                _ => {
+                    // Fall back to login if name is null, empty, or missing
+                    user["login"].as_str()
+                        .unwrap_or("")
+                        .to_string()
+                }
+            };
             let login = user["login"].as_str()
                 .ok_or_else(|| ClientError::MissingField("user.login".to_string()))?
                 .to_string();
