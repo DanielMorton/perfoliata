@@ -8,6 +8,7 @@ pub mod client;
 pub mod error;
 pub mod models;
 pub mod utils;
+pub mod cli;
 
 // Re-export main types for easier use
 pub use client::INaturalistClient;
