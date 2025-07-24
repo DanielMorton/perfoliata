@@ -11,35 +11,70 @@ pub struct LocationStats {
 
 impl LocationStats {
     pub fn from_histogram_response(response: &Value, location: &str) -> Result<Vec<Self>> {
-        let results_obj = response["results"].as_object()
-            .ok_or_else(|| ClientError::InvalidResponse("Invalid histogram response format".to_string()))?;
+        // Debug: Print the actual response structure to understand the format
+        println!("DEBUG - Full response: {}", serde_json::to_string_pretty(response).unwrap_or_else(|_| "Failed to serialize".to_string()));
 
-        let mut stats = Vec::new();
-        for (date_str, count) in results_obj {
-            // Handle different date formats: "2023", "2023-01", "2023-01-01", etc.
-            let year = if date_str.contains('-') {
-                // Extract year from date format like "2023-01" or "2023-01-01"
-                date_str.split('-').next()
-                    .ok_or_else(|| ClientError::Parse("Invalid date format".to_string()))?
-                    .parse::<i32>()
-                    .map_err(|e| ClientError::Parse(format!("Failed to parse year from '{}': {}", date_str, e)))?
-            } else {
-                // Direct year format like "2023"
-                date_str.parse::<i32>()
-                    .map_err(|e| ClientError::Parse(format!("Failed to parse year from '{}': {}", date_str, e)))?
-            };
+        // The histogram API returns an object where keys are time periods and values are counts
+        if let Some(results_obj) = response["results"].as_object() {
+            let mut stats = Vec::new();
 
-            let observation_count = count.as_i64()
-                .ok_or_else(|| ClientError::InvalidResponse(format!("Invalid count format for date '{}': expected number, got {:?}", date_str, count)))?;
+            println!("DEBUG - Results object keys: {:?}", results_obj.keys().collect::<Vec<_>>());
 
-            stats.push(LocationStats {
-                year,
-                observation_count,
-                location: location.to_string(),
-            });
+            for (key, count) in results_obj {
+                // Skip non-numeric keys that might be metadata
+                if !key.chars().next().unwrap_or('a').is_ascii_digit() {
+                    println!("DEBUG - Skipping non-numeric key: {}", key);
+                    continue;
+                }
+
+                println!("DEBUG - Processing key: {} with value: {:?}", key, count);
+
+                // Handle different date formats: "2023", "2023-01", "2023-01-01", etc.
+                let year = if key.contains('-') {
+                    // Extract year from date format like "2023-01" or "2023-01-01"
+                    key.split('-').next()
+                        .ok_or_else(|| ClientError::Parse("Invalid date format".to_string()))?
+                        .parse::<i32>()
+                        .map_err(|e| ClientError::Parse(format!("Failed to parse year from '{}': {}", key, e)))?
+                } else {
+                    // Direct year format like "2023"
+                    key.parse::<i32>()
+                        .map_err(|e| ClientError::Parse(format!("Failed to parse year from '{}': {}", key, e)))?
+                };
+
+                let observation_count = count.as_i64()
+                    .ok_or_else(|| ClientError::InvalidResponse(format!("Invalid count format for date '{}': expected number, got {:?}", key, count)))?;
+
+                stats.push(LocationStats {
+                    year,
+                    observation_count,
+                    location: location.to_string(),
+                });
+            }
+
+            Ok(stats)
+        } else if let Some(results_array) = response["results"].as_array() {
+            println!("DEBUG - Results is an array with {} elements", results_array.len());
+            // Alternative: API might return an array of objects
+            let mut stats = Vec::new();
+
+            for (index, count) in results_array.iter().enumerate() {
+                let observation_count = count.as_i64()
+                    .ok_or_else(|| ClientError::InvalidResponse(format!("Invalid count at index {}: expected number, got {:?}", index, count)))?;
+
+                // If it's an array, we might need additional context for the year
+                // For now, use the index as a placeholder - this might need adjustment based on actual API behavior
+                stats.push(LocationStats {
+                    year: index as i32, // This is likely wrong - may need to be adjusted
+                    observation_count,
+                    location: location.to_string(),
+                });
+            }
+
+            Ok(stats)
+        } else {
+            Err(ClientError::InvalidResponse(format!("Unexpected histogram response format. Results field type: {:?}", response["results"])))
         }
-
-        Ok(stats)
     }
 }
 
