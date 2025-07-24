@@ -8,7 +8,7 @@ use std::time::Duration;
 use crate::api::requests::RequestHandler;
 use crate::client::rate_limiter::RateLimiter;
 use crate::error::{ClientError, Result};
-use crate::models::stats::{LocationStats, ObserverStats, SpeciesStats};
+use crate::models::{LocationStats, ObserverStats, SpeciesStats};
 
 #[derive(Debug, Clone)]
 pub struct INaturalistClient {
