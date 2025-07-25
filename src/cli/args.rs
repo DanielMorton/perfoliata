@@ -21,55 +21,11 @@ pub struct Cli {
 pub enum Commands {
     /// Get location histogram statistics (monthly observation counts)
     LocationStats {
-        /// Location ID (place_id)
-        #[arg(short, long)]
-        location: String,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-    },
-    /// Get observer statistics for a location
-    ObserverStats {
-        /// Location ID (place_id)
-        #[arg(short, long)]
-        location: String,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-    },
-    /// Get identifier statistics for a location
-    IdentifierStats {
-        /// Location ID (place_id)
-        #[arg(short, long)]
-        location: String,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-    },
-    /// Get species statistics for a location
-    SpeciesStats {
-        /// Location ID (place_id) - optional for global stats
-        #[arg(short, long)]
-        location: Option<String>,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-    },
-    /// Process multiple locations in parallel
-    ProcessLocations {
-        /// Comma-separated list of location IDs
+        /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
         #[arg(short, long, value_delimiter = ',')]
         locations: Vec<String>,
 
-        /// Type of statistics to gather
-        #[arg(short, long, value_enum)]
-        stat_type: StatType,
-
-        /// Maximum number of parallel workers
+        /// Maximum number of parallel workers when processing multiple locations
         #[arg(short = 'w', long, default_value = "4")]
         max_workers: usize,
 
@@ -77,14 +33,48 @@ pub enum Commands {
         #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
         params: Vec<(String, String)>,
     },
-}
+    /// Get observer statistics for a location
+    ObserverStats {
+        /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
+        #[arg(short, long, value_delimiter = ',')]
+        locations: Vec<String>,
 
-#[derive(clap::ValueEnum, Clone)]
-pub enum StatType {
-    Location,
-    Observer,
-    Identifier,
-    Species,
+        /// Maximum number of parallel workers when processing multiple locations
+        #[arg(short = 'w', long, default_value = "4")]
+        max_workers: usize,
+
+        /// Additional query parameters (key=value format)
+        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
+        params: Vec<(String, String)>,
+    },
+    /// Get identifier statistics for a location
+    IdentifierStats {
+        /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
+        #[arg(short, long, value_delimiter = ',')]
+        locations: Vec<String>,
+
+        /// Maximum number of parallel workers when processing multiple locations
+        #[arg(short = 'w', long, default_value = "4")]
+        max_workers: usize,
+
+        /// Additional query parameters (key=value format)
+        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
+        params: Vec<(String, String)>,
+    },
+    /// Get species statistics for a location
+    SpeciesStats {
+        /// Location ID(s) (place_id) - optional for global stats, can specify multiple with comma separation or multiple flags
+        #[arg(short, long, value_delimiter = ',')]
+        locations: Vec<String>,
+
+        /// Maximum number of parallel workers when processing multiple locations
+        #[arg(short = 'w', long, default_value = "4")]
+        max_workers: usize,
+
+        /// Additional query parameters (key=value format)
+        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
+        params: Vec<(String, String)>,
+    },
 }
 
 /// Parse a single key-value pair for parameters
