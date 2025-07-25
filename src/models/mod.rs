@@ -1,4 +1,3 @@
-
 pub mod location;
 pub mod observer;
 pub mod species;

@@ -1,7 +1,7 @@
 use clap::Parser;
 use log::info;
+use perfoliata::cli::{Cli, execute_command};
 use perfoliata::{ClientError, INaturalistClient};
-use perfoliata::cli::{execute_command, Cli};
 
 #[tokio::main]
 async fn main() -> Result<(), ClientError> {
@@ -20,8 +20,11 @@ async fn main() -> Result<(), ClientError> {
 
     // Create client with specified rate limit
     let client = INaturalistClient::new(cli.rate_limit)?;
-    info!("Created iNaturalist client with rate limit: {} req/s", cli.rate_limit);
+    info!(
+        "Created iNaturalist client with rate limit: {} req/s",
+        cli.rate_limit
+    );
 
-    let _= execute_command(&client, cli.command).await;
+    let _ = execute_command(&client, cli.command).await;
     Ok(())
 }

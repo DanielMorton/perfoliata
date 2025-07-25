@@ -109,7 +109,7 @@ impl INaturalistClient {
     ) -> Vec<T>
     where
         F: Fn(String) -> Fut + Send + Sync + Clone + 'static,
-        Fut: std::future::Future<Output = Result<T>> + Send,
+        Fut: Future<Output = Result<T>> + Send,
         T: Send + 'static,
     {
         let max_workers = max_workers.unwrap_or_else(|| std::cmp::min(4, locations.len()));

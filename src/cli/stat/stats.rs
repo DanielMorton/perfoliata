@@ -1,0 +1,38 @@
+use crate::{ClientError, INaturalistClient};
+use std::collections::HashMap;
+use std::sync::Arc;
+
+/// Generic parallel processing function
+pub async fn process_stats_parallel<T, F, Fut>(
+    client: &INaturalistClient,
+    locations: Vec<String>,
+    extra_params: HashMap<String, String>,
+    max_workers: usize,
+    stats_fn: F,
+) -> Vec<Vec<T>>
+where
+    F: Fn(INaturalistClient, String, HashMap<String, String>) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = Result<Vec<T>, ClientError>> + Send,
+    T: Send + 'static,
+{
+    let stats_fn = Arc::new(stats_fn);
+    let extra_params = Arc::new(extra_params);
+
+    client
+        .process_locations_parallel(
+            locations,
+            {
+                let stats_fn = Arc::clone(&stats_fn);
+                let extra_params = Arc::clone(&extra_params);
+                let client = client.clone();
+                move |location| {
+                    let stats_fn = Arc::clone(&stats_fn);
+                    let extra_params = (*extra_params).clone();
+                    let client = client.clone();
+                    async move { stats_fn(client, location, extra_params).await }
+                }
+            },
+            Some(max_workers),
+        )
+        .await
+}
