@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -32,6 +33,10 @@ pub enum Commands {
         /// Additional query parameters (key=value format)
         #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
         params: Vec<(String, String)>,
+
+        /// Output file path (optional, defaults to stdout)
+        #[arg(short, long)]
+        output: PathBuf,
     },
     /// Get observer statistics for a location
     ObserverStats {
@@ -46,6 +51,10 @@ pub enum Commands {
         /// Additional query parameters (key=value format)
         #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
         params: Vec<(String, String)>,
+
+        /// Output file path (optional, defaults to stdout)
+        #[arg(short, long)]
+        output: PathBuf,
     },
     /// Get identifier statistics for a location
     IdentifierStats {
@@ -60,6 +69,10 @@ pub enum Commands {
         /// Additional query parameters (key=value format)
         #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
         params: Vec<(String, String)>,
+
+        /// Output file path (optional, defaults to stdout)
+        #[arg(short, long)]
+        output: PathBuf,
     },
     /// Get species statistics for a location
     SpeciesStats {
@@ -74,6 +87,10 @@ pub enum Commands {
         /// Additional query parameters (key=value format)
         #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
         params: Vec<(String, String)>,
+
+        /// Output file path (optional, defaults to stdout)
+        #[arg(short, long)]
+        output: PathBuf,
     },
 }
 
