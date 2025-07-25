@@ -3,9 +3,8 @@ use crate::cli::stat::{
     params_to_hashmap,
 };
 use crate::cli::{StatType, handle_location_processing};
-use crate::{ClientError, INaturalistClient, LocationStats, ObserverStats, SpeciesStats};
-use log::{error, info};
-use std::collections::HashMap;
+use crate::{ClientError, INaturalistClient};
+use log::info;
 
 /// Handle parallel processing of multiple locations
 pub async fn handle_process_locations(
