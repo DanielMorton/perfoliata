@@ -2,11 +2,15 @@ use crate::{ClientError, INaturalistClient};
 use std::collections::HashMap;
 use std::sync::Arc;
 
+fn params_to_hashmap(params: Vec<(String, String)>) -> HashMap<String, String> {
+    params.into_iter().collect()
+}
+
 /// Generic parallel processing function
 pub async fn process_stats_parallel<T, F, Fut>(
     client: &INaturalistClient,
     locations: Vec<String>,
-    extra_params: HashMap<String, String>,
+    extra_params: Vec<(String, String)>,
     max_workers: usize,
     stats_fn: F,
 ) -> Vec<Vec<T>>
@@ -16,7 +20,7 @@ where
     T: Send + 'static,
 {
     let stats_fn = Arc::new(stats_fn);
-    let extra_params = Arc::new(extra_params);
+    let extra_params = Arc::new(params_to_hashmap(extra_params));
 
     client
         .process_locations_parallel(

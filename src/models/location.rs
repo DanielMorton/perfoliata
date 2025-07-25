@@ -1,4 +1,6 @@
+use crate::INaturalistClient;
 use crate::error::{ClientError, Result};
+use crate::models::model::process_stats_parallel;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -44,4 +46,22 @@ impl LocationStats {
 
         Ok(stats)
     }
+}
+
+/// Handle location parallel processing
+pub async fn handle_location_processing(
+    client: &INaturalistClient,
+    locations: Vec<String>,
+    extra_params: Vec<(String, String)>,
+    max_workers: usize,
+) -> Vec<Vec<LocationStats>> {
+    process_stats_parallel(
+        client,
+        locations,
+        extra_params,
+        max_workers,
+        |client, location, params| async move {
+            client.get_location_stats(&location, params).await
+        },
+    ).await
 }

@@ -8,7 +8,7 @@ use std::time::Duration;
 use crate::api::requests::RequestHandler;
 use crate::client::rate_limiter::RateLimiter;
 use crate::error::{ClientError, Result};
-use crate::models::{LocationStats, ObserverStats, SpeciesStats};
+use crate::models::{IdentifierStats, LocationStats, ObserverStats, SpeciesStats};
 
 #[derive(Debug, Clone)]
 pub struct INaturalistClient {
@@ -69,7 +69,7 @@ impl INaturalistClient {
         &self,
         location: &str,
         extra_params: HashMap<String, String>,
-    ) -> Result<Vec<ObserverStats>> {
+    ) -> Result<Vec<IdentifierStats>> {
         let results = self
             .request_handler
             .get_stats(
@@ -80,7 +80,7 @@ impl INaturalistClient {
             )
             .await?;
 
-        ObserverStats::from_response(&results, location)
+        IdentifierStats::from_response(&results, location)
     }
 
     pub async fn get_species_stats(
