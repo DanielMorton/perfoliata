@@ -1,8 +1,10 @@
+use std::path::PathBuf;
 use crate::INaturalistClient;
 use crate::error::{ClientError, Result};
 use crate::models::model::process_stats_parallel;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use crate::models::save_stats_to_csv;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LocationStats {
@@ -63,4 +65,17 @@ pub async fn handle_location_processing(
             client.get_location_stats(&location, params).await
         },
     ).await.into_iter().flatten().collect::<Vec<_>>()
+}
+
+/// Execute location statistics command
+pub async fn execute_location_stats(
+    client: &INaturalistClient,
+    locations: Vec<String>,
+    max_workers: usize,
+    params: Vec<(String, String)>,
+    output: PathBuf,
+) -> Result<()> {
+    let res = handle_location_processing(client, locations, params, max_workers).await;
+    save_stats_to_csv(&res, output)?;
+    Ok(())
 }

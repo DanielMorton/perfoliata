@@ -1,7 +1,10 @@
+use std::path::PathBuf;
+use crate::INaturalistClient;
+use crate::error::{ClientError, Result};
 use crate::models::model::process_stats_parallel;
-use crate::{ClientError, INaturalistClient};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use crate::models::save_stats_to_csv;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct IdentifierStats {
@@ -13,7 +16,7 @@ pub struct IdentifierStats {
 }
 
 impl IdentifierStats {
-    pub fn from_response(response: &Value, location: &str) -> crate::Result<Vec<Self>> {
+    pub fn from_response(response: &Value, location: &str) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid identifiers response format".to_string())
         })?;
@@ -69,4 +72,17 @@ pub async fn handle_identifier_processing(
             client.get_identifier_stats(&location, params).await
         },
     ).await.into_iter().flatten().collect::<Vec<_>>()
+}
+
+/// Execute identifier statistics command
+pub async fn execute_identifier_stats(
+    client: &INaturalistClient,
+    locations: Vec<String>,
+    max_workers: usize,
+    params: Vec<(String, String)>,
+    output: PathBuf,
+) -> Result<()> {
+    let res = handle_identifier_processing(client, locations, params, max_workers).await;
+    save_stats_to_csv(&res, output)?;
+    Ok(())
 }

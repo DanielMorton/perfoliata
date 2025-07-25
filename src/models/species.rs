@@ -1,8 +1,10 @@
+use std::path::PathBuf;
 use crate::INaturalistClient;
 use crate::error::{ClientError, Result};
 use crate::models::model::process_stats_parallel;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use crate::models::save_stats_to_csv;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SpeciesStats {
@@ -78,4 +80,17 @@ pub async fn handle_species_processing(
     .into_iter()
     .flatten()
     .collect::<Vec<_>>()
+}
+
+/// Execute species statistics command
+pub async fn execute_species_stats(
+    client: &INaturalistClient,
+    locations: Vec<String>,
+    max_workers: usize,
+    params: Vec<(String, String)>,
+    output: PathBuf,
+) -> Result<()> {
+    let res = handle_species_processing(client, locations, params, max_workers).await;
+    save_stats_to_csv(&res, output)?;
+    Ok(())
 }

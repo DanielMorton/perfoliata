@@ -6,7 +6,7 @@ pub mod observer;
 pub mod species;
 
 pub use csv::save_stats_to_csv;
-pub use identifier::IdentifierStats;
-pub use location::LocationStats;
-pub use observer::ObserverStats;
-pub use species::SpeciesStats;
+pub use identifier::{execute_identifier_stats, IdentifierStats};
+pub use location::{execute_location_stats, LocationStats};
+pub use observer::{execute_observer_stats, ObserverStats};
+pub use species::{execute_species_stats, SpeciesStats};
