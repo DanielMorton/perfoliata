@@ -135,11 +135,11 @@ impl INaturalistClient {
             .filter_map(|result| match result {
                 Ok(Ok(data)) => Some(data),
                 Ok(Err(e)) => {
-                    error!("Task failed: {}", e);
+                    error!("Task failed: {e}");
                     None
                 }
                 Err(e) => {
-                    error!("Task panicked: {}", e);
+                    error!("Task panicked: {e}");
                     None
                 }
             })

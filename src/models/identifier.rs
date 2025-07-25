@@ -59,7 +59,7 @@ pub async fn handle_identifier_processing(
     locations: Vec<String>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<Vec<IdentifierStats>> {
+) -> Vec<IdentifierStats> {
     process_stats_parallel(
         client,
         locations,
@@ -68,5 +68,5 @@ pub async fn handle_identifier_processing(
         |client, location, params| async move {
             client.get_identifier_stats(&location, params).await
         },
-    ).await
+    ).await.into_iter().flatten().collect::<Vec<_>>()
 }

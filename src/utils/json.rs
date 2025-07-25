@@ -11,7 +11,7 @@ pub fn flatten_dict(obj: &Value) -> HashMap<String, Value> {
                 Value::Object(_) => {
                     let nested = flatten_dict(value);
                     for (nested_key, nested_value) in nested {
-                        result.insert(format!("{}_{}", key, nested_key), nested_value);
+                        result.insert(format!("{key}_{nested_key}"), nested_value);
                     }
                 }
                 _ => {

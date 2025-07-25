@@ -64,7 +64,7 @@ pub async fn handle_species_processing(
     locations: Vec<String>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<Vec<SpeciesStats>> {
+) -> Vec<SpeciesStats> {
     process_stats_parallel(
         client,
         locations,
@@ -75,4 +75,7 @@ pub async fn handle_species_processing(
         },
     )
     .await
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>()
 }

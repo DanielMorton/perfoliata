@@ -23,13 +23,12 @@ impl LocationStats {
         if let Some(month_data) = results_obj.get("month_of_year").and_then(|v| v.as_object()) {
             for (month_str, count) in month_data {
                 let month = month_str.parse::<i32>().map_err(|e| {
-                    ClientError::Parse(format!("Failed to parse month from '{}': {}", month_str, e))
+                    ClientError::Parse(format!("Failed to parse month from '{month_str}': {e}"))
                 })?;
 
                 let observation_count = count.as_i64().ok_or_else(|| {
                     ClientError::InvalidResponse(format!(
-                        "Invalid count format for month '{}': expected number, got {:?}",
-                        month_str, count
+                        "Invalid count format for month '{month_str}': expected number, got {count:?}"
                     ))
                 })?;
 
@@ -54,7 +53,7 @@ pub async fn handle_location_processing(
     locations: Vec<String>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<Vec<LocationStats>> {
+) -> Vec<LocationStats> {
     process_stats_parallel(
         client,
         locations,
@@ -63,5 +62,5 @@ pub async fn handle_location_processing(
         |client, location, params| async move {
             client.get_location_stats(&location, params).await
         },
-    ).await
+    ).await.into_iter().flatten().collect::<Vec<_>>()
 }

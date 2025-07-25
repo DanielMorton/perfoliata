@@ -61,19 +61,16 @@ impl RequestHandler {
                 Err(ClientError::RateLimit) => {
                     retry_count += 1;
                     if retry_count > max_retries {
-                        error!("Max retries exceeded for endpoint: {}", endpoint);
+                        error!("Max retries exceeded for endpoint: {endpoint}");
                         return Err(ClientError::RateLimit);
                     }
 
                     let delay = exponential_backoff(retry_count, 1.0, 60.0);
-                    info!(
-                        "Rate limit hit for endpoint {}. Retrying in {:.2?}...",
-                        endpoint, delay
-                    );
+                    info!("Rate limit hit for endpoint {endpoint}. Retrying in {delay:.2?}...");
                     sleep(delay).await;
                 }
                 Err(e) => {
-                    error!("Error for endpoint {}: {}", endpoint, e);
+                    error!("Error for endpoint {endpoint}: {e}");
                     return Err(e);
                 }
             }

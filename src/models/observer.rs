@@ -60,7 +60,7 @@ pub async fn handle_observer_processing(
     locations: Vec<String>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<Vec<ObserverStats>> {
+) -> Vec<ObserverStats> {
     process_stats_parallel(
         client,
         locations,
@@ -69,5 +69,5 @@ pub async fn handle_observer_processing(
         |client, location, params| async move {
             client.get_observer_stats(&location, params).await
         },
-    ).await
+    ).await.into_iter().flatten().collect::<Vec<_>>()
 }

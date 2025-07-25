@@ -20,7 +20,6 @@ pub async fn execute_command(
             output,
         } => {
             let res = handle_location_processing(client, locations, params, max_workers).await;
-            let res = res.into_iter().flatten().collect::<Vec<_>>();
             save_stats_to_csv(&res, output);
         }
 
@@ -31,7 +30,6 @@ pub async fn execute_command(
             output,
         } => {
             let res = handle_observer_processing(client, locations, params, max_workers).await;
-            let res = res.into_iter().flatten().collect::<Vec<_>>();
             save_stats_to_csv(&res, output);
         }
 
@@ -42,7 +40,6 @@ pub async fn execute_command(
             output,
         } => {
             let res = handle_identifier_processing(client, locations, params, max_workers).await;
-            let res = res.into_iter().flatten().collect::<Vec<_>>();
             save_stats_to_csv(&res, output);
         }
 
@@ -53,7 +50,6 @@ pub async fn execute_command(
             output,
         } => {
             let res = handle_species_processing(client, locations, params, max_workers).await;
-            let res = res.into_iter().flatten().collect::<Vec<_>>();
             save_stats_to_csv(&res, output);
         }
     }
