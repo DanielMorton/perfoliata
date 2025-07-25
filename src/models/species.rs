@@ -13,11 +13,11 @@ pub struct SpeciesStats {
     pub name: String,
     pub rank: String,
     pub ancestor_ids: Vec<i64>,
-    pub location: String,
+    pub location: Option<u32>,
 }
 
 impl SpeciesStats {
-    pub fn from_response(response: &Value, location: Option<&str>) -> Result<Vec<Self>> {
+    pub fn from_response(response: &Value, location: Option<u32>) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid species response format".to_string())
         })?;
@@ -52,7 +52,7 @@ impl SpeciesStats {
                 name,
                 rank,
                 ancestor_ids,
-                location: location.unwrap_or("").to_string(),
+                location,
             });
         }
 
@@ -63,7 +63,7 @@ impl SpeciesStats {
 /// Handle species parallel processing
 pub async fn handle_species_processing(
     client: &INaturalistClient,
-    locations: Vec<String>,
+    locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
 ) -> Vec<SpeciesStats> {
@@ -73,7 +73,7 @@ pub async fn handle_species_processing(
         extra_params,
         max_workers,
         |client, location, params| async move {
-            client.get_species_stats(Some(&location), params).await
+            client.get_species_stats(Some(location), params).await
         },
     )
     .await
@@ -85,7 +85,7 @@ pub async fn handle_species_processing(
 /// Execute species statistics command
 pub async fn execute_species_stats(
     client: &INaturalistClient,
-    locations: Vec<String>,
+    locations: Vec<u32>,
     max_workers: usize,
     params: Vec<(String, String)>,
     output: PathBuf,

@@ -9,13 +9,13 @@ fn params_to_hashmap(params: Vec<(String, String)>) -> HashMap<String, String> {
 /// Generic parallel processing function
 pub async fn process_stats_parallel<T, F, Fut>(
     client: &INaturalistClient,
-    locations: Vec<String>,
+    locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
     stats_fn: F,
 ) -> Vec<Vec<T>>
 where
-    F: Fn(INaturalistClient, String, HashMap<String, String>) -> Fut + Send + Sync + 'static,
+    F: Fn(INaturalistClient, u32, HashMap<String, String>) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = Result<Vec<T>, ClientError>> + Send,
     T: Send + 'static,
 {

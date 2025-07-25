@@ -24,7 +24,7 @@ pub enum Commands {
     LocationStats {
         /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
         #[arg(short, long, value_delimiter = ',')]
-        locations: Vec<String>,
+        locations: Vec<u32>,
 
         /// Maximum number of parallel workers when processing multiple locations
         #[arg(short = 'w', long, default_value = "4")]
@@ -42,7 +42,7 @@ pub enum Commands {
     ObserverStats {
         /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
         #[arg(short, long, value_delimiter = ',')]
-        locations: Vec<String>,
+        locations: Vec<u32>,
 
         /// Maximum number of parallel workers when processing multiple locations
         #[arg(short = 'w', long, default_value = "4")]
@@ -60,7 +60,7 @@ pub enum Commands {
     IdentifierStats {
         /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
         #[arg(short, long, value_delimiter = ',')]
-        locations: Vec<String>,
+        locations: Vec<u32>,
 
         /// Maximum number of parallel workers when processing multiple locations
         #[arg(short = 'w', long, default_value = "4")]
@@ -78,7 +78,7 @@ pub enum Commands {
     SpeciesStats {
         /// Location ID(s) (place_id) - optional for global stats, can specify multiple with comma separation or multiple flags
         #[arg(short, long, value_delimiter = ',')]
-        locations: Vec<String>,
+        locations: Vec<u32>,
 
         /// Maximum number of parallel workers when processing multiple locations
         #[arg(short = 'w', long, default_value = "4")]

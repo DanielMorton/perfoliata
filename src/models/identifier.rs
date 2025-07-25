@@ -12,11 +12,11 @@ pub struct IdentifierStats {
     pub species_count: i64,
     pub name: String,
     pub login: String,
-    pub location: String,
+    pub location: u32,
 }
 
 impl IdentifierStats {
-    pub fn from_response(response: &Value, location: &str) -> Result<Vec<Self>> {
+    pub fn from_response(response: &Value, location: u32) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid identifiers response format".to_string())
         })?;
@@ -48,7 +48,7 @@ impl IdentifierStats {
                 species_count,
                 name,
                 login,
-                location: location.to_string(),
+                location,
             });
         }
 
@@ -59,7 +59,7 @@ impl IdentifierStats {
 /// Handle identifier parallel processing
 pub async fn handle_identifier_processing(
     client: &INaturalistClient,
-    locations: Vec<String>,
+    locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
 ) -> Vec<IdentifierStats> {
@@ -69,7 +69,7 @@ pub async fn handle_identifier_processing(
         extra_params,
         max_workers,
         |client, location, params| async move {
-            client.get_identifier_stats(&location, params).await
+            client.get_identifier_stats(location, params).await
         },
     ).await.into_iter().flatten().collect::<Vec<_>>()
 }
@@ -77,7 +77,7 @@ pub async fn handle_identifier_processing(
 /// Execute identifier statistics command
 pub async fn execute_identifier_stats(
     client: &INaturalistClient,
-    locations: Vec<String>,
+    locations: Vec<u32>,
     max_workers: usize,
     params: Vec<(String, String)>,
     output: PathBuf,

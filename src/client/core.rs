@@ -31,7 +31,7 @@ impl INaturalistClient {
 
     pub async fn get_location_stats(
         &self,
-        location: &str,
+        location: u32,
         extra_params: HashMap<String, String>,
     ) -> Result<Vec<LocationStats>> {
         let results = self
@@ -49,7 +49,7 @@ impl INaturalistClient {
 
     pub async fn get_observer_stats(
         &self,
-        location: &str,
+        location: u32,
         extra_params: HashMap<String, String>,
     ) -> Result<Vec<ObserverStats>> {
         let results = self
@@ -67,7 +67,7 @@ impl INaturalistClient {
 
     pub async fn get_identifier_stats(
         &self,
-        location: &str,
+        location: u32,
         extra_params: HashMap<String, String>,
     ) -> Result<Vec<IdentifierStats>> {
         let results = self
@@ -85,7 +85,7 @@ impl INaturalistClient {
 
     pub async fn get_species_stats(
         &self,
-        location: Option<&str>,
+        location: Option<u32>,
         extra_params: HashMap<String, String>,
     ) -> Result<Vec<SpeciesStats>> {
         let results = self
@@ -103,12 +103,12 @@ impl INaturalistClient {
 
     pub async fn process_locations_parallel<T, F, Fut>(
         &self,
-        locations: Vec<String>,
+        locations: Vec<u32>,
         process_fn: F,
         max_workers: Option<usize>,
     ) -> Vec<T>
     where
-        F: Fn(String) -> Fut + Send + Sync + Clone + 'static,
+        F: Fn(u32) -> Fut + Send + Sync + Clone + 'static,
         Fut: Future<Output = Result<T>> + Send,
         T: Send + 'static,
     {

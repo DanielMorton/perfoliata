@@ -10,11 +10,11 @@ use crate::models::save_stats_to_csv;
 pub struct LocationStats {
     pub month: i32,
     pub observation_count: i64,
-    pub location: String,
+    pub location: u32,
 }
 
 impl LocationStats {
-    pub fn from_histogram_response(response: &Value, location: &str) -> Result<Vec<Self>> {
+    pub fn from_histogram_response(response: &Value, location: u32) -> Result<Vec<Self>> {
         let results_obj = response["results"].as_object().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid histogram response format".to_string())
         })?;
@@ -37,7 +37,7 @@ impl LocationStats {
                 stats.push(LocationStats {
                     month,
                     observation_count,
-                    location: location.to_string(),
+                    location,
                 });
             }
         }
@@ -52,7 +52,7 @@ impl LocationStats {
 /// Handle location parallel processing
 pub async fn handle_location_processing(
     client: &INaturalistClient,
-    locations: Vec<String>,
+    locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
 ) -> Vec<LocationStats> {
@@ -62,7 +62,7 @@ pub async fn handle_location_processing(
         extra_params,
         max_workers,
         |client, location, params| async move {
-            client.get_location_stats(&location, params).await
+            client.get_location_stats(location, params).await
         },
     ).await.into_iter().flatten().collect::<Vec<_>>()
 }
@@ -70,7 +70,7 @@ pub async fn handle_location_processing(
 /// Execute location statistics command
 pub async fn execute_location_stats(
     client: &INaturalistClient,
-    locations: Vec<String>,
+    locations: Vec<u32>,
     max_workers: usize,
     params: Vec<(String, String)>,
     output: PathBuf,

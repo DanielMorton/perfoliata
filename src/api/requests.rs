@@ -80,7 +80,7 @@ impl RequestHandler {
     pub async fn get_stats(
         &self,
         endpoint_tag: &str,
-        location: Option<&str>,
+        location: Option<u32>,
         extra_params: HashMap<String, String>,
         rate_limiter: &RateLimiter,
     ) -> Result<Value> {
