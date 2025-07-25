@@ -8,8 +8,8 @@ use crate::models::save_stats_to_csv;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LocationStats {
-    pub month: i32,
-    pub observation_count: i64,
+    pub month: u8,
+    pub observation_count: u64,
     pub location: u32,
 }
 
@@ -24,11 +24,11 @@ impl LocationStats {
         // Handle month_of_year structure
         if let Some(month_data) = results_obj.get("month_of_year").and_then(|v| v.as_object()) {
             for (month_str, count) in month_data {
-                let month = month_str.parse::<i32>().map_err(|e| {
+                let month = month_str.parse::<u8>().map_err(|e| {
                     ClientError::Parse(format!("Failed to parse month from '{month_str}': {e}"))
                 })?;
 
-                let observation_count = count.as_i64().ok_or_else(|| {
+                let observation_count = count.as_u64().ok_or_else(|| {
                     ClientError::InvalidResponse(format!(
                         "Invalid count format for month '{month_str}': expected number, got {count:?}"
                     ))

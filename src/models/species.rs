@@ -8,11 +8,11 @@ use crate::models::save_stats_to_csv;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SpeciesStats {
-    pub count: i64,
-    pub id: i64,
+    pub count: u64,
+    pub id: u64,
     pub name: String,
     pub rank: String,
-    pub ancestor_ids: Vec<i64>,
+    pub ancestor_ids: Vec<u64>,
     pub location: Option<u32>,
 }
 
@@ -25,12 +25,12 @@ impl SpeciesStats {
         let mut stats = Vec::new();
         for item in results_array {
             let count = item["count"]
-                .as_i64()
+                .as_u64()
                 .ok_or_else(|| ClientError::MissingField("count".to_string()))?;
 
             let taxon = &item["taxon"];
             let id = taxon["id"]
-                .as_i64()
+                .as_u64()
                 .ok_or_else(|| ClientError::MissingField("taxon.id".to_string()))?;
             let name = taxon["name"]
                 .as_str()
@@ -43,7 +43,7 @@ impl SpeciesStats {
 
             let ancestor_ids = taxon["ancestor_ids"]
                 .as_array()
-                .map(|arr| arr.iter().filter_map(|v| v.as_i64()).collect())
+                .map(|arr| arr.iter().filter_map(|v| v.as_u64()).collect())
                 .unwrap_or_default();
 
             stats.push(SpeciesStats {

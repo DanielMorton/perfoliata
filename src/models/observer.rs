@@ -8,8 +8,8 @@ use crate::models::save_stats_to_csv;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ObserverStats {
-    pub observation_count: i64,
-    pub species_count: i64,
+    pub observation_count: u64,
+    pub species_count: u64,
     pub name: String,
     pub login: String,
     pub location: u32,
@@ -24,10 +24,10 @@ impl ObserverStats {
         let mut stats = Vec::new();
         for item in results_array {
             let observation_count = item["observation_count"]
-                .as_i64()
+                .as_u64()
                 .ok_or_else(|| ClientError::MissingField("observation_count".to_string()))?;
             let species_count = item["species_count"]
-                .as_i64()
+                .as_u64()
                 .ok_or_else(|| ClientError::MissingField("species_count".to_string()))?;
 
             let user = &item["user"];
