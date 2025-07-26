@@ -33,4 +33,16 @@ pub enum ClientError {
     Other(String),
 }
 
+impl From<String> for ClientError {
+    fn from(msg: String) -> Self {
+        ClientError::Other(msg)
+    }
+}
+
+impl From<&str> for ClientError {
+    fn from(msg: &str) -> Self {
+        ClientError::Other(msg.to_string())
+    }
+}
+
 pub type Result<T> = std::result::Result<T, ClientError>;
