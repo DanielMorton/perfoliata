@@ -143,9 +143,7 @@ pub fn read_locations_from_csv(
     use std::fs::File;
 
     let file = File::open(csv_file)?;
-    let mut reader = ReaderBuilder::new()
-        .has_headers(true)
-        .from_reader(file);
+    let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
 
     let headers = reader.headers()?.clone();
     let column_index = headers

@@ -1,8 +1,8 @@
 use crate::{ClientError, INaturalistClient};
+use indicatif::{ProgressBar, ProgressStyle};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use indicatif::{ProgressBar, ProgressStyle};
 use tokio::sync::Mutex;
 
 fn params_to_hashmap(params: Vec<(String, String)>) -> HashMap<String, String> {
@@ -121,4 +121,3 @@ fn format_duration(duration: Duration) -> String {
         format!("{}s", seconds)
     }
 }
-

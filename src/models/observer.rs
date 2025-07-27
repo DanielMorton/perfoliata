@@ -1,10 +1,10 @@
-use std::path::PathBuf;
 use crate::INaturalistClient;
 use crate::error::{ClientError, Result};
 use crate::models::model::process_stats_parallel;
+use crate::models::save_stats_to_csv;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use crate::models::save_stats_to_csv;
+use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ObserverStats {
@@ -68,10 +68,12 @@ pub async fn handle_observer_processing(
         locations,
         extra_params,
         max_workers,
-        |client, location, params| async move {
-            client.get_observer_stats(location, params).await
-        },
-    ).await.into_iter().flatten().collect::<Vec<_>>()
+        |client, location, params| async move { client.get_observer_stats(location, params).await },
+    )
+    .await
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>()
 }
 
 /// Execute observer statistics command
