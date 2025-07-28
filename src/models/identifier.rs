@@ -5,11 +5,12 @@ use crate::models::save_stats_to_csv;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::PathBuf;
+use crate::utils::json::extract_u32_field;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct IdentifierStats {
-    pub identification_count: u64,
-    pub species_count: u64,
+    pub identification_count: u32,
+    pub species_count: u32,
     pub name: String,
     pub login: String,
     pub location: u32,
@@ -23,12 +24,8 @@ impl IdentifierStats {
 
         let mut stats = Vec::new();
         for item in results_array {
-            let identification_count = item["identification_count"]
-                .as_u64()
-                .ok_or_else(|| ClientError::MissingField("identification_count".to_string()))?;
-            let species_count = item["species_count"]
-                .as_u64()
-                .ok_or_else(|| ClientError::MissingField("species_count".to_string()))?;
+            let identification_count = extract_u32_field(item, "identification_count")?;
+            let species_count = extract_u32_field(item, "species_count")?;
 
             let user = &item["user"];
             let name = match user["name"].as_str() {

@@ -5,11 +5,12 @@ use crate::models::save_stats_to_csv;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::PathBuf;
+use crate::utils::json::json_value_to_u32;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LocationStats {
     pub month: u8,
-    pub observation_count: u64,
+    pub observation_count: u32,
     pub location: u32,
 }
 
@@ -28,11 +29,7 @@ impl LocationStats {
                     ClientError::Parse(format!("Failed to parse month from '{month_str}': {e}"))
                 })?;
 
-                let observation_count = count.as_u64().ok_or_else(|| {
-                    ClientError::InvalidResponse(format!(
-                        "Invalid count format for month '{month_str}': expected number, got {count:?}"
-                    ))
-                })?;
+                let observation_count = json_value_to_u32(count)?;
 
                 stats.push(LocationStats {
                     month,

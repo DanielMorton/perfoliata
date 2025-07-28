@@ -5,14 +5,15 @@ use crate::models::save_stats_to_csv;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::PathBuf;
+use crate::utils::json::{extract_u32_field, json_value_to_u32};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SpeciesStats {
-    pub count: u64,
-    pub id: u64,
+    pub count: u32,
+    pub id: u32,
     pub name: String,
     pub rank: String,
-    pub ancestor_ids: Vec<u64>,
+    pub ancestor_ids: Vec<u32>,
     pub location: Option<u32>,
 }
 
@@ -24,14 +25,10 @@ impl SpeciesStats {
 
         let mut stats = Vec::new();
         for item in results_array {
-            let count = item["count"]
-                .as_u64()
-                .ok_or_else(|| ClientError::MissingField("count".to_string()))?;
+            let count = extract_u32_field(item, "count")?;
 
             let taxon = &item["taxon"];
-            let id = taxon["id"]
-                .as_u64()
-                .ok_or_else(|| ClientError::MissingField("taxon.id".to_string()))?;
+            let id = extract_u32_field(taxon, "id")?;
             let name = taxon["name"]
                 .as_str()
                 .ok_or_else(|| ClientError::MissingField("taxon.name".to_string()))?
@@ -43,8 +40,8 @@ impl SpeciesStats {
 
             let ancestor_ids = taxon["ancestor_ids"]
                 .as_array()
-                .map(|arr| arr.iter().filter_map(|v| v.as_u64()).collect())
-                .unwrap_or_default();
+                .map(|arr| arr.iter().map(|v| json_value_to_u32(v)).collect::<Result<Vec<u32>>>())
+                .unwrap_or_else(|| Ok(Vec::new()))?;
 
             stats.push(SpeciesStats {
                 count,
