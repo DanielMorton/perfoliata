@@ -2,10 +2,10 @@ use crate::INaturalistClient;
 use crate::error::{ClientError, Result};
 use crate::models::model::process_stats_parallel;
 use crate::models::save_stats_to_csv;
+use crate::utils::json::json_value_to_u32;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::PathBuf;
-use crate::utils::json::json_value_to_u32;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LocationStats {

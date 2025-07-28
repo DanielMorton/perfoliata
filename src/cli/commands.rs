@@ -1,5 +1,5 @@
-use crate::cli::args::get_locations;
 use crate::cli::Commands;
+use crate::cli::args::get_locations;
 use crate::client::INaturalistClient;
 use crate::error::ClientError;
 use crate::models::{
@@ -13,19 +13,47 @@ pub async fn execute_command(
     match command {
         Commands::LocationStats(cmd) => {
             let resolved_locations = get_locations(&cmd.locations, &cmd.csv_file, &cmd.csv_column)?;
-            execute_location_stats(client, resolved_locations, cmd.max_workers, cmd.params, cmd.output).await
+            execute_location_stats(
+                client,
+                resolved_locations,
+                cmd.max_workers,
+                cmd.params,
+                cmd.output,
+            )
+            .await
         }
         Commands::ObserverStats(cmd) => {
             let resolved_locations = get_locations(&cmd.locations, &cmd.csv_file, &cmd.csv_column)?;
-            execute_observer_stats(client, resolved_locations, cmd.max_workers, cmd.params, cmd.output).await
+            execute_observer_stats(
+                client,
+                resolved_locations,
+                cmd.max_workers,
+                cmd.params,
+                cmd.output,
+            )
+            .await
         }
         Commands::IdentifierStats(cmd) => {
             let resolved_locations = get_locations(&cmd.locations, &cmd.csv_file, &cmd.csv_column)?;
-            execute_identifier_stats(client, resolved_locations, cmd.max_workers, cmd.params, cmd.output).await
+            execute_identifier_stats(
+                client,
+                resolved_locations,
+                cmd.max_workers,
+                cmd.params,
+                cmd.output,
+            )
+            .await
         }
         Commands::SpeciesStats(cmd) => {
             let resolved_locations = get_locations(&cmd.locations, &cmd.csv_file, &cmd.csv_column)?;
-            execute_species_stats(client, resolved_locations, cmd.max_workers, cmd.params, cmd.output).await
+            execute_species_stats(
+                client,
+                resolved_locations,
+                cmd.max_workers,
+                cmd.params,
+                cmd.output,
+            )
+            .await
         }
     }
 }

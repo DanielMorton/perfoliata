@@ -2,10 +2,10 @@ use crate::INaturalistClient;
 use crate::error::{ClientError, Result};
 use crate::models::model::process_stats_parallel;
 use crate::models::save_stats_to_csv;
+use crate::utils::json::{extract_u32_field, json_value_to_u32};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::PathBuf;
-use crate::utils::json::{extract_u32_field, json_value_to_u32};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SpeciesStats {
@@ -40,7 +40,11 @@ impl SpeciesStats {
 
             let ancestor_ids = taxon["ancestor_ids"]
                 .as_array()
-                .map(|arr| arr.iter().map(|v| json_value_to_u32(v)).collect::<Result<Vec<u32>>>())
+                .map(|arr| {
+                    arr.iter()
+                        .map(|v| json_value_to_u32(v))
+                        .collect::<Result<Vec<u32>>>()
+                })
                 .unwrap_or_else(|| Ok(Vec::new()))?;
 
             stats.push(SpeciesStats {

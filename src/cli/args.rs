@@ -1,9 +1,9 @@
-use clap::{Parser, Subcommand};
-use std::path::PathBuf;
 use crate::cli::identifier_stats::IdentifierStatsCommand;
 use crate::cli::location_stats::LocationStatsCommand;
 use crate::cli::observer_stats::ObserverStatsCommand;
 use crate::cli::species_stats::SpeciesStatsCommand;
+use clap::{Parser, Subcommand};
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(name = "inaturalist-cli")]
@@ -33,7 +33,6 @@ pub enum Commands {
     /// Get species statistics for a location
     SpeciesStats(SpeciesStatsCommand),
 }
-
 
 /// Parse a single key-value pair for parameters
 pub fn parse_key_val(s: &str) -> Result<(String, String), String> {
