@@ -1,5 +1,9 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
+use crate::cli::identifier_stats::IdentifierStatsCommand;
+use crate::cli::location_stats::LocationStatsCommand;
+use crate::cli::observer_stats::ObserverStatsCommand;
+use crate::cli::species_stats::SpeciesStatsCommand;
 
 #[derive(Parser)]
 #[command(name = "inaturalist-cli")]
@@ -21,113 +25,18 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     /// Get location histogram statistics (monthly observation counts)
-    LocationStats {
-        /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
-        #[arg(short, long, value_delimiter = ',', conflicts_with = "csv_file")]
-        locations: Vec<u32>,
-
-        /// CSV file containing locations
-        #[arg(long, conflicts_with = "locations")]
-        csv_file: Option<PathBuf>,
-
-        /// Column name in CSV file containing location IDs
-        #[arg(long, default_value = "id", requires = "csv_file")]
-        csv_column: String,
-
-        /// Maximum number of parallel workers when processing multiple locations
-        #[arg(short = 'w', long, default_value = "4")]
-        max_workers: usize,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-
-        /// Output file path (optional, defaults to stdout)
-        #[arg(short, long)]
-        output: PathBuf,
-    },
+    LocationStats(LocationStatsCommand),
     /// Get observer statistics for a location
-    ObserverStats {
-        /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
-        #[arg(short, long, value_delimiter = ',', conflicts_with = "csv_file")]
-        locations: Vec<u32>,
-
-        /// CSV file containing locations
-        #[arg(long, conflicts_with = "locations")]
-        csv_file: Option<PathBuf>,
-
-        /// Column name in CSV file containing location IDs
-        #[arg(long, default_value = "id", requires = "csv_file")]
-        csv_column: String,
-
-        /// Maximum number of parallel workers when processing multiple locations
-        #[arg(short = 'w', long, default_value = "4")]
-        max_workers: usize,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-
-        /// Output file path (optional, defaults to stdout)
-        #[arg(short, long)]
-        output: PathBuf,
-    },
+    ObserverStats(ObserverStatsCommand),
     /// Get identifier statistics for a location
-    IdentifierStats {
-        /// Location ID(s) (place_id) - can specify multiple with comma separation or multiple flags
-        #[arg(short, long, value_delimiter = ',', conflicts_with = "csv_file")]
-        locations: Vec<u32>,
-
-        /// CSV file containing locations
-        #[arg(long, conflicts_with = "locations")]
-        csv_file: Option<PathBuf>,
-
-        /// Column name in CSV file containing location IDs
-        #[arg(long, default_value = "id", requires = "csv_file")]
-        csv_column: String,
-
-        /// Maximum number of parallel workers when processing multiple locations
-        #[arg(short = 'w', long, default_value = "4")]
-        max_workers: usize,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-
-        /// Output file path (optional, defaults to stdout)
-        #[arg(short, long)]
-        output: PathBuf,
-    },
+    IdentifierStats(IdentifierStatsCommand),
     /// Get species statistics for a location
-    SpeciesStats {
-        /// Location ID(s) (place_id) - optional for global stats, can specify multiple with comma separation or multiple flags
-        #[arg(short, long, value_delimiter = ',', conflicts_with = "csv_file")]
-        locations: Vec<u32>,
-
-        /// CSV file containing locations
-        #[arg(long, conflicts_with = "locations")]
-        csv_file: Option<PathBuf>,
-
-        /// Column name in CSV file containing location IDs
-        #[arg(long, default_value = "id", requires = "csv_file")]
-        csv_column: String,
-
-        /// Maximum number of parallel workers when processing multiple locations
-        #[arg(short = 'w', long, default_value = "4")]
-        max_workers: usize,
-
-        /// Additional query parameters (key=value format)
-        #[arg(short = 'p', long = "param", value_parser = parse_key_val)]
-        params: Vec<(String, String)>,
-
-        /// Output file path (optional, defaults to stdout)
-        #[arg(short, long)]
-        output: PathBuf,
-    },
+    SpeciesStats(SpeciesStatsCommand),
 }
 
+
 /// Parse a single key-value pair for parameters
-fn parse_key_val(s: &str) -> Result<(String, String), String> {
+pub fn parse_key_val(s: &str) -> Result<(String, String), String> {
     let pos = s
         .find('=')
         .ok_or_else(|| format!("invalid KEY=value: no `=` found in `{s}`"))?;
