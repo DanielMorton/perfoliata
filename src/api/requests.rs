@@ -106,7 +106,7 @@ impl RequestHandler {
         extra_params: HashMap<String, String>,
         rate_limiter: &RateLimiter,
     ) -> Result<Value> {
-        let endpoint = Endpoints::full_url(Endpoints::taxa());
+        let endpoint = Endpoints::full_url(Endpoints::TAXA);
         let mut params = HashMap::new();
         params.insert("taxon_id".to_string(), taxon_id.to_string());
 

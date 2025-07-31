@@ -6,6 +6,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::api::requests::RequestHandler;
+use crate::api::endpoints::Endpoints;
 use crate::client::rate_limiter::RateLimiter;
 use crate::error::{ClientError, Result};
 use crate::models::{IdentifierStats, LocationStats, ObserverStats, SpeciesStats};
@@ -37,7 +38,7 @@ impl INaturalistClient {
         let results = self
             .request_handler
             .get_stats(
-                "observations/histogram",
+                Endpoints::OBSERVATIONS_HISTOGRAM,
                 Some(location),
                 extra_params,
                 &self.rate_limiter,
@@ -55,7 +56,7 @@ impl INaturalistClient {
         let results = self
             .request_handler
             .get_stats(
-                "observations/observers",
+                Endpoints::OBSERVATIONS_OBSERVERS,
                 Some(location),
                 extra_params,
                 &self.rate_limiter,
@@ -73,7 +74,7 @@ impl INaturalistClient {
         let results = self
             .request_handler
             .get_stats(
-                "observations/identifiers",
+                Endpoints::OBSERVATIONS_IDENTIFIERS,
                 Some(location),
                 extra_params,
                 &self.rate_limiter,
@@ -91,7 +92,7 @@ impl INaturalistClient {
         let results = self
             .request_handler
             .get_stats(
-                "observations/species_counts",
+                Endpoints::OBSERVATIONS_SPECIES_COUNTS,
                 location,
                 extra_params,
                 &self.rate_limiter,
