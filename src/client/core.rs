@@ -9,7 +9,7 @@ use crate::api::requests::RequestHandler;
 use crate::api::endpoints::Endpoints;
 use crate::client::rate_limiter::RateLimiter;
 use crate::error::{ClientError, Result};
-use crate::models::{IdentifierStats, LocationStats, ObserverStats, SpeciesStats};
+use crate::models::{ObservationIdentifierStats, ObservationHistogramStats, ObservationObserverStats, ObservationSpeciesStats};
 
 #[derive(Debug, Clone)]
 pub struct INaturalistClient {
@@ -30,11 +30,11 @@ impl INaturalistClient {
         })
     }
 
-    pub async fn get_location_stats(
+    pub async fn get_observation_histogram(
         &self,
         location: u32,
         extra_params: HashMap<String, String>,
-    ) -> Result<Vec<LocationStats>> {
+    ) -> Result<Vec<ObservationHistogramStats>> {
         let results = self
             .request_handler
             .get_stats(
@@ -45,14 +45,14 @@ impl INaturalistClient {
             )
             .await?;
 
-        LocationStats::from_histogram_response(&results, location)
+        ObservationHistogramStats::from_histogram_response(&results, location)
     }
 
     pub async fn get_observer_stats(
         &self,
         location: u32,
         extra_params: HashMap<String, String>,
-    ) -> Result<Vec<ObserverStats>> {
+    ) -> Result<Vec<ObservationObserverStats>> {
         let results = self
             .request_handler
             .get_stats(
@@ -63,14 +63,14 @@ impl INaturalistClient {
             )
             .await?;
 
-        ObserverStats::from_response(&results, location)
+        ObservationObserverStats::from_response(&results, location)
     }
 
     pub async fn get_identifier_stats(
         &self,
         location: u32,
         extra_params: HashMap<String, String>,
-    ) -> Result<Vec<IdentifierStats>> {
+    ) -> Result<Vec<ObservationIdentifierStats>> {
         let results = self
             .request_handler
             .get_stats(
@@ -81,14 +81,14 @@ impl INaturalistClient {
             )
             .await?;
 
-        IdentifierStats::from_response(&results, location)
+        ObservationIdentifierStats::from_response(&results, location)
     }
 
     pub async fn get_species_stats(
         &self,
         location: Option<u32>,
         extra_params: HashMap<String, String>,
-    ) -> Result<Vec<SpeciesStats>> {
+    ) -> Result<Vec<ObservationSpeciesStats>> {
         let results = self
             .request_handler
             .get_stats(
@@ -99,7 +99,7 @@ impl INaturalistClient {
             )
             .await?;
 
-        SpeciesStats::from_response(&results, location)
+        ObservationSpeciesStats::from_response(&results, location)
     }
 
     pub async fn process_locations_parallel<T, F, Fut>(

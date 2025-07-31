@@ -8,7 +8,7 @@ use serde_json::Value;
 use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct IdentifierStats {
+pub struct ObservationIdentifierStats {
     pub identification_count: u32,
     pub species_count: u32,
     pub name: String,
@@ -16,7 +16,7 @@ pub struct IdentifierStats {
     pub location: u32,
 }
 
-impl IdentifierStats {
+impl ObservationIdentifierStats {
     pub fn from_response(response: &Value, location: u32) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid identifiers response format".to_string())
@@ -40,7 +40,7 @@ impl IdentifierStats {
                 .ok_or_else(|| ClientError::MissingField("user.login".to_string()))?
                 .to_string();
 
-            stats.push(IdentifierStats {
+            stats.push(ObservationIdentifierStats {
                 identification_count,
                 species_count,
                 name,
@@ -59,7 +59,7 @@ pub async fn handle_identifier_processing(
     locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<IdentifierStats> {
+) -> Vec<ObservationIdentifierStats> {
     process_stats_parallel(
         client,
         locations,

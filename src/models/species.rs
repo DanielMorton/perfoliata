@@ -8,7 +8,7 @@ use serde_json::Value;
 use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct SpeciesStats {
+pub struct ObservationSpeciesStats {
     pub count: u32,
     pub id: u32,
     pub name: String,
@@ -17,7 +17,7 @@ pub struct SpeciesStats {
     pub location: Option<u32>,
 }
 
-impl SpeciesStats {
+impl ObservationSpeciesStats {
     pub fn from_response(response: &Value, location: Option<u32>) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid species response format".to_string())
@@ -47,7 +47,7 @@ impl SpeciesStats {
                 })
                 .unwrap_or_else(|| Ok(Vec::new()))?;
 
-            stats.push(SpeciesStats {
+            stats.push(ObservationSpeciesStats {
                 count,
                 id,
                 name,
@@ -67,7 +67,7 @@ pub async fn handle_species_processing(
     locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<SpeciesStats> {
+) -> Vec<ObservationSpeciesStats> {
     process_stats_parallel(
         client,
         locations,

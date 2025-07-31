@@ -8,7 +8,7 @@ use serde_json::Value;
 use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ObserverStats {
+pub struct ObservationObserverStats {
     pub observation_count: u32,
     pub species_count: u32,
     pub name: String,
@@ -16,7 +16,7 @@ pub struct ObserverStats {
     pub location: u32,
 }
 
-impl ObserverStats {
+impl ObservationObserverStats {
     pub fn from_response(response: &Value, location: u32) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid observers response format".to_string())
@@ -40,7 +40,7 @@ impl ObserverStats {
                 .ok_or_else(|| ClientError::MissingField("user.login".to_string()))?
                 .to_string();
 
-            stats.push(ObserverStats {
+            stats.push(ObservationObserverStats {
                 observation_count,
                 species_count,
                 name,
@@ -59,7 +59,7 @@ pub async fn handle_observer_processing(
     locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<ObserverStats> {
+) -> Vec<ObservationObserverStats> {
     process_stats_parallel(
         client,
         locations,

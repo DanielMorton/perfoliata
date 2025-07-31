@@ -13,7 +13,7 @@ pub mod utils;
 // Re-export main types for easier use
 pub use client::INaturalistClient;
 pub use error::{ClientError, Result};
-pub use models::{LocationStats, ObserverStats, SpeciesStats};
+pub use models::{ObservationHistogramStats, ObservationObserverStats, ObservationSpeciesStats};
 
 // Re-export commonly used types
 pub use std::collections::HashMap;

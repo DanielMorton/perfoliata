@@ -8,13 +8,13 @@ use serde_json::Value;
 use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct LocationStats {
+pub struct ObservationHistogramStats {
     pub month: u8,
     pub observation_count: u32,
     pub location: u32,
 }
 
-impl LocationStats {
+impl ObservationHistogramStats {
     pub fn from_histogram_response(response: &Value, location: u32) -> Result<Vec<Self>> {
         let results_obj = response["results"].as_object().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid histogram response format".to_string())
@@ -31,7 +31,7 @@ impl LocationStats {
 
                 let observation_count = json_value_to_u32(count)?;
 
-                stats.push(LocationStats {
+                stats.push(ObservationHistogramStats {
                     month,
                     observation_count,
                     location,
@@ -52,13 +52,13 @@ pub async fn handle_location_processing(
     locations: Vec<u32>,
     extra_params: Vec<(String, String)>,
     max_workers: usize,
-) -> Vec<LocationStats> {
+) -> Vec<ObservationHistogramStats> {
     process_stats_parallel(
         client,
         locations,
         extra_params,
         max_workers,
-        |client, location, params| async move { client.get_location_stats(location, params).await },
+        |client, location, params| async move { client.get_observation_histogram(location, params).await },
     )
     .await
     .into_iter()
