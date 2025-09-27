@@ -11,11 +11,11 @@ use std::path::PathBuf;
 pub struct ObservationHistogramStats {
     pub month: u8,
     pub observation_count: u32,
-    pub location: u32,
+    pub location: Option<u32>,
 }
 
 impl ObservationHistogramStats {
-    pub fn from_histogram_response(response: &Value, location: u32) -> Result<Vec<Self>> {
+    pub fn from_histogram_response(response: &Value, location: Option<u32>) -> Result<Vec<Self>> {
         let results_obj = response["results"].as_object().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid histogram response format".to_string())
         })?;
@@ -49,7 +49,7 @@ impl ObservationHistogramStats {
 /// Handle location parallel processing
 pub async fn handle_location_processing(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     extra_params: Vec<(String, String)>,
     max_workers: usize,
 ) -> Vec<ObservationHistogramStats> {
@@ -58,7 +58,9 @@ pub async fn handle_location_processing(
         locations,
         extra_params,
         max_workers,
-        |client, location, params| async move { client.get_observation_histogram(location, params).await },
+        |client, location, params| async move {
+            client.get_observation_histogram(location, &params).await
+        },
     )
     .await
     .into_iter()
@@ -69,7 +71,7 @@ pub async fn handle_location_processing(
 /// Execute location statistics command
 pub async fn execute_location_stats(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     max_workers: usize,
     params: Vec<(String, String)>,
     output: PathBuf,

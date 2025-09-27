@@ -1,4 +1,5 @@
 use crate::cli::args::parse_key_val;
+use crate::error::Result;
 use clap::Args;
 use std::path::PathBuf;
 
@@ -30,7 +31,7 @@ pub struct SpeciesStatsCommand {
 }
 
 impl SpeciesStatsCommand {
-    pub fn execute(&self) -> crate::error::Result<()> {
+    pub fn execute(&self) -> Result<()> {
         // Implementation goes here
         println!("Executing species stats command");
         Ok(())

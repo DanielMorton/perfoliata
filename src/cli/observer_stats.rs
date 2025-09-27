@@ -1,4 +1,5 @@
 use crate::cli::args::parse_key_val;
+use crate::error::Result;
 use clap::Args;
 use std::path::PathBuf;
 
@@ -30,7 +31,7 @@ pub struct ObserverStatsCommand {
 }
 
 impl ObserverStatsCommand {
-    pub fn execute(&self) -> crate::error::Result<()> {
+    pub fn execute(&self) -> Result<()> {
         // Implementation goes here
         println!("Executing observer stats command");
         Ok(())

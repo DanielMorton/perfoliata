@@ -81,7 +81,7 @@ impl RequestHandler {
         &self,
         endpoint_tag: &str,
         location: Option<u32>,
-        extra_params: HashMap<String, String>,
+        extra_params: &HashMap<String, String>,
         rate_limiter: &RateLimiter,
     ) -> Result<Value> {
         let endpoint = Endpoints::full_url(endpoint_tag);
@@ -93,7 +93,7 @@ impl RequestHandler {
         }
 
         for (key, value) in extra_params {
-            params.insert(key, value);
+            params.insert(key.clone(), value.clone());
         }
 
         self.get_data_with_retry(&endpoint, &params, rate_limiter, 5)

@@ -13,11 +13,11 @@ pub struct ObservationIdentifierStats {
     pub species_count: u32,
     pub name: String,
     pub login: String,
-    pub location: u32,
+    pub location: Option<u32>,
 }
 
 impl ObservationIdentifierStats {
-    pub fn from_response(response: &Value, location: u32) -> Result<Vec<Self>> {
+    pub fn from_response(response: &Value, location: Option<u32>) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid identifiers response format".to_string())
         })?;
@@ -56,7 +56,7 @@ impl ObservationIdentifierStats {
 /// Handle identifier parallel processing
 pub async fn handle_identifier_processing(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     extra_params: Vec<(String, String)>,
     max_workers: usize,
 ) -> Vec<ObservationIdentifierStats> {
@@ -66,7 +66,7 @@ pub async fn handle_identifier_processing(
         extra_params,
         max_workers,
         |client, location, params| async move {
-            client.get_identifier_stats(location, params).await
+            client.get_identifier_stats(location, &params).await
         },
     ).await.into_iter().flatten().collect::<Vec<_>>()
 }
@@ -74,7 +74,7 @@ pub async fn handle_identifier_processing(
 /// Execute identifier statistics command
 pub async fn execute_identifier_stats(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     max_workers: usize,
     params: Vec<(String, String)>,
     output: PathBuf,

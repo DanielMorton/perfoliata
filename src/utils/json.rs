@@ -1,4 +1,4 @@
-use crate::ClientError;
+use crate::{ClientError, Result};
 use serde_json::Value;
 use std::collections::HashMap;
 
@@ -26,7 +26,7 @@ pub fn flatten_dict(obj: &Value) -> HashMap<String, Value> {
 }
 
 /// Convert a serde_json::Value to u32
-pub fn json_value_to_u32(value: &Value) -> Result<u32, ClientError> {
+pub fn json_value_to_u32(value: &Value) -> Result<u32> {
     match value {
         Value::Number(n) => {
             if let Some(u) = n.as_u64() {
@@ -57,13 +57,46 @@ pub fn json_value_to_u32(value: &Value) -> Result<u32, ClientError> {
     }
 }
 
+// Convert a serde_json::Value to f64
+pub fn json_value_to_f64(value: &Value) -> Result<f64> {
+    match value {
+        Value::Number(n) => {
+            if let Some(f) = n.as_f64() {
+                Ok(f)
+            } else if let Some(u) = n.as_u64() {
+                Ok(u as f64)
+            } else if let Some(i) = n.as_i64() {
+                Ok(i as f64)
+            } else {
+                Err(ClientError::Parse("Not a valid number".to_string()))
+            }
+        }
+        Value::String(s) => s
+            .parse::<f64>()
+            .map_err(|_| ClientError::Parse(format!("Failed to parse string as f64: '{}'", s))),
+        _ => Err(ClientError::Parse(format!(
+            "Expected number or string, got: {:?}",
+            value
+        ))),
+    }
+}
+
 /// Helper function to extract u32 from JSON object by field name
-pub fn extract_u32_field(obj: &Value, field_name: &str) -> Result<u32, ClientError> {
+pub fn extract_u32_field(obj: &Value, field_name: &str) -> Result<u32> {
     let value = obj
         .get(field_name)
         .ok_or_else(|| ClientError::MissingField(field_name.to_string()))?;
 
     json_value_to_u32(value)
+}
+
+/// Helper function to extract f64 from JSON object by field name
+pub fn extract_f64_field(obj: &Value, field_name: &str) -> Result<f64> {
+    let value = obj
+        .get(field_name)
+        .ok_or_else(|| ClientError::MissingField(field_name.to_string()))?;
+
+    json_value_to_f64(value)
 }
 
 #[cfg(test)]

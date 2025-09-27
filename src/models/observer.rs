@@ -13,11 +13,11 @@ pub struct ObservationObserverStats {
     pub species_count: u32,
     pub name: String,
     pub login: String,
-    pub location: u32,
+    pub location: Option<u32>,
 }
 
 impl ObservationObserverStats {
-    pub fn from_response(response: &Value, location: u32) -> Result<Vec<Self>> {
+    pub fn from_response(response: &Value, location: Option<u32>) -> Result<Vec<Self>> {
         let results_array = response["results"].as_array().ok_or_else(|| {
             ClientError::InvalidResponse("Invalid observers response format".to_string())
         })?;
@@ -56,7 +56,7 @@ impl ObservationObserverStats {
 /// Handle observer parallel processing
 pub async fn handle_observer_processing(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     extra_params: Vec<(String, String)>,
     max_workers: usize,
 ) -> Vec<ObservationObserverStats> {
@@ -65,7 +65,7 @@ pub async fn handle_observer_processing(
         locations,
         extra_params,
         max_workers,
-        |client, location, params| async move { client.get_observer_stats(location, params).await },
+        |client, location, params| async move { client.get_observer_stats(location, &params).await },
     )
     .await
     .into_iter()
@@ -76,7 +76,7 @@ pub async fn handle_observer_processing(
 /// Execute observer statistics command
 pub async fn execute_observer_stats(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     max_workers: usize,
     params: Vec<(String, String)>,
     output: PathBuf,

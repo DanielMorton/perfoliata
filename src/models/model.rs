@@ -1,6 +1,7 @@
 use crate::{ClientError, INaturalistClient};
 use indicatif::{ProgressBar, ProgressStyle};
 use std::collections::HashMap;
+use std::future::Future;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
@@ -12,19 +13,55 @@ fn params_to_hashmap(params: Vec<(String, String)>) -> HashMap<String, String> {
 /// Generic parallel processing function with progress bar
 pub async fn process_stats_parallel<T, F, Fut>(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     extra_params: Vec<(String, String)>,
     max_workers: usize,
     stats_fn: F,
 ) -> Vec<Vec<T>>
 where
-    F: Fn(INaturalistClient, u32, HashMap<String, String>) -> Fut + Send + Sync + 'static,
+    F: Fn(INaturalistClient, Option<u32>, HashMap<String, String>) -> Fut + Send + Sync + 'static,
     Fut: Future<Output = Result<Vec<T>, ClientError>> + Send,
     T: Send + 'static,
 {
-    let total_locations = locations.len();
-    let stats_fn = Arc::new(stats_fn);
     let extra_params = Arc::new(params_to_hashmap(extra_params));
+    let stats_fn = Arc::new(stats_fn);
+
+    // Handle empty locations (global query) without progress bar
+    if locations.is_empty() {
+        let client_clone = client.clone();
+        let extra_params = (*extra_params).clone();
+
+        println!("Processing global query...");
+        let start_time = Instant::now();
+
+        let result = client_clone
+            .process_parallel(
+                locations,
+                {
+                    let stats_fn = Arc::clone(&stats_fn);
+                    let client_for_closure = client.clone();
+                    move |location| {
+                        let stats_fn = Arc::clone(&stats_fn);
+                        let extra_params = extra_params.clone();
+                        let client = client_for_closure.clone();
+
+                        async move { stats_fn(client, location, extra_params).await }
+                    }
+                },
+                Some(max_workers),
+            )
+            .await;
+
+        println!(
+            "Global query completed in {}",
+            format_duration(start_time.elapsed())
+        );
+
+        return result;
+    }
+
+    // Process multiple locations with progress bar
+    let total_locations = locations.len();
 
     // Create progress bar
     let progress_bar = ProgressBar::new(total_locations as u64);
@@ -40,8 +77,8 @@ where
     let start_time = Instant::now();
     let completed_count = Arc::new(Mutex::new(0usize));
 
-    client
-        .process_locations_parallel(
+    let result = client
+        .process_parallel(
             locations,
             {
                 let stats_fn = Arc::clone(&stats_fn);
@@ -49,7 +86,6 @@ where
                 let client = client.clone();
                 let progress_bar = progress_bar.clone();
                 let completed_count = Arc::clone(&completed_count);
-                let start_time = start_time;
 
                 move |location| {
                     let stats_fn = Arc::clone(&stats_fn);
@@ -90,20 +126,16 @@ where
             },
             Some(max_workers),
         )
-        .await
-        .into_iter()
-        .map(|result| {
-            // Finish progress bar when all tasks complete
-            if progress_bar.position() == total_locations as u64 {
-                progress_bar.finish_with_message(format!(
-                    "Completed {} locations in {}",
-                    total_locations,
-                    format_duration(start_time.elapsed())
-                ));
-            }
-            result
-        })
-        .collect()
+        .await;
+
+    // Finish progress bar
+    progress_bar.finish_with_message(format!(
+        "Completed {} locations in {}",
+        total_locations,
+        format_duration(start_time.elapsed())
+    ));
+
+    result
 }
 
 /// Format duration in a human-readable way

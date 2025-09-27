@@ -42,7 +42,7 @@ impl ObservationSpeciesStats {
                 .as_array()
                 .map(|arr| {
                     arr.iter()
-                        .map(|v| json_value_to_u32(v))
+                        .map(json_value_to_u32)
                         .collect::<Result<Vec<u32>>>()
                 })
                 .unwrap_or_else(|| Ok(Vec::new()))?;
@@ -64,7 +64,7 @@ impl ObservationSpeciesStats {
 /// Handle species parallel processing
 pub async fn handle_species_processing(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     extra_params: Vec<(String, String)>,
     max_workers: usize,
 ) -> Vec<ObservationSpeciesStats> {
@@ -73,9 +73,7 @@ pub async fn handle_species_processing(
         locations,
         extra_params,
         max_workers,
-        |client, location, params| async move {
-            client.get_species_stats(Some(location), params).await
-        },
+        |client, location, params| async move { client.get_species_stats(location, &params).await },
     )
     .await
     .into_iter()
@@ -86,7 +84,7 @@ pub async fn handle_species_processing(
 /// Execute species statistics command
 pub async fn execute_species_stats(
     client: &INaturalistClient,
-    locations: Vec<u32>,
+    locations: &[u32],
     max_workers: usize,
     params: Vec<(String, String)>,
     output: PathBuf,

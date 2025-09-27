@@ -2,6 +2,7 @@ use crate::cli::identifier_stats::IdentifierStatsCommand;
 use crate::cli::location_stats::LocationStatsCommand;
 use crate::cli::observer_stats::ObserverStatsCommand;
 use crate::cli::species_stats::SpeciesStatsCommand;
+use crate::cli::taxon_stats::TaxaCommand;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -32,6 +33,8 @@ pub enum Commands {
     IdentifierStats(IdentifierStatsCommand),
     /// Get species statistics for a location
     SpeciesStats(SpeciesStatsCommand),
+    /// Get taxon list
+    Taxa(TaxaCommand),
 }
 
 /// Parse a single key-value pair for parameters
