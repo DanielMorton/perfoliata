@@ -6,7 +6,7 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser)]
-#[command(name = "inaturalist-cli")]
+#[command(name = "perfoliata")]
 #[command(about = "A CLI tool for interacting with the iNaturalist API")]
 #[command(version = "1.0")]
 pub struct Cli {
