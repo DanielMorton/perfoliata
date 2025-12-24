@@ -10,7 +10,7 @@ pub struct TaxaCommand {
     pub id_above: u32,
 
     /// Must have an ID below this value
-    #[arg(long, default_value = "1650000")]
+    #[arg(long, default_value = "1659500")]
     pub id_below: u32,
 
     #[arg(long, default_value = "200")]

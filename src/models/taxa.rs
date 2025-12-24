@@ -27,6 +27,7 @@ pub struct Taxon {
     pub complete_species_count: Option<u32>,
     pub wikipedia_url: Option<String>,
     pub iconic_taxon_name: Option<String>,
+    pub preferred_common_name: Option<String>,
 }
 
 impl Taxon {
@@ -90,6 +91,7 @@ impl Taxon {
         let complete_species_count = item["complete_species_count"].as_u64().map(|v| v as u32);
         let wikipedia_url = item["wikipedia_url"].as_str().map(|s| s.to_string());
         let iconic_taxon_name = item["iconic_taxon_name"].as_str().map(|s| s.to_string());
+        let preferred_common_name = item["preferred_common_name"].as_str().map(|s| s.to_string());
 
         Ok(Taxon {
             id,
@@ -110,6 +112,7 @@ impl Taxon {
             complete_species_count,
             wikipedia_url,
             iconic_taxon_name,
+            preferred_common_name
         })
     }
 }

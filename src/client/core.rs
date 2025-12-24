@@ -112,7 +112,7 @@ impl INaturalistClient {
     ) -> Result<Vec<Taxon>> {
         let mut params = extra_params.clone();
         if let Some(start) = id_start {
-            let end = start + (*extra_params.get("per_page").unwrap()).parse::<u32>().unwrap() - 1;
+            let end = start + (*extra_params.get("per_page").unwrap()).parse::<u32>().unwrap();
             params.insert("id_above".to_string(), start.to_string());
             params.insert("id_below".to_string(), end.to_string());
         }
